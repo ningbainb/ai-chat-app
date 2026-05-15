@@ -61,3 +61,16 @@
 5. 触发后进入单次运行详情页，在底部 **Artifacts** 下载 `app-debug-apk`。
 
 > 说明：当前工作流会在任意分支的 push、PR，以及手动 `workflow_dispatch` 下触发。
+
+
+### 如果看到 “BUILD FAILED / exit code 1” 是什么意思
+这表示云端编译失败了（不是成功产出 APK），常见原因有：
+- 依赖下载失败（网络或仓库访问问题）
+- Kotlin/Gradle 编译错误
+- Android SDK 组件缺失
+
+现在工作流会额外上传以下排障文件：
+- `build-debug-log`（完整构建日志）
+- `gradle-reports`（Gradle 报告目录）
+
+请在失败的那次 Actions 运行页下载这两个 Artifact，把最后 80~120 行日志发我，我可以直接定位到具体报错行。

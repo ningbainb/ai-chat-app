@@ -28,23 +28,46 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.7
 
-      - name: Build debug APK
-        run: gradle --no-daemon :app:assembleDebug
+      - name: Build debug APK (with logs)
+        run: |
+          gradle --no-daemon :app:assembleDebug --stacktrace --info 2>&1 | tee build-debug.log
 
       - name: Upload debug APK artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
+      - name: Upload build log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-debug-log
+          path: build-debug.log
+          if-no-files-found: warn
+
+      - name: Upload Gradle reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-reports
+          path: |
+            **/build/reports/**
+            **/build/outputs/logs/**
+          if-no-files-found: warn
+
       - name: Publish APK to GitHub Release
-        if: github.event_name == 'workflow_dispatch' && inputs.publish_release == 'true'
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.publish_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: debug-apk-${{ github.run_number }}
