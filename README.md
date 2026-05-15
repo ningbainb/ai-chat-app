@@ -74,3 +74,15 @@
 - `gradle-reports`（Gradle 报告目录）
 
 请在失败的那次 Actions 运行页下载这两个 Artifact，把最后 80~120 行日志发我，我可以直接定位到具体报错行。
+
+
+### 如果 `Publish APK to GitHub Release` 显示空白
+常见原因是这次运行没有可上传的 APK 文件，或你没有在手动运行时把 `publish_release` 设为 `true`。
+
+排查顺序：
+1. 先看同一次运行里 `Upload APK artifact(s)` 是否成功。
+2. 到 Artifacts 下载 `app-debug-apk`，确认 APK 确实已生成。
+3. 手动运行工作流时，确认 `publish_release=true`。
+4. 再看 `Collect APK file list for release` 步骤日志，确认找到的 APK 路径。
+
+> 现在工作流会先收集 APK 文件列表，再上传到 Release，避免 Release 步骤“空白但不清楚原因”。

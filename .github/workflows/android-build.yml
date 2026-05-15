@@ -72,12 +72,32 @@ jobs:
             **/build/outputs/logs/**
           if-no-files-found: warn
 
-      - name: Publish APK to GitHub Release
+      - name: Collect APK file list for release
         if: success() && github.event_name == 'workflow_dispatch' && inputs.publish_release == 'true'
+        id: apk_files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find app/build/outputs/apk -type f -name "*.apk" | sort)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No APK files found for release upload."
+            exit 0
+          fi
+          {
+            echo 'paths<<EOF'
+            printf '%s
+' "${files[@]}"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      - name: Publish APK to GitHub Release
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.publish_release == 'true' && steps.apk_files.outputs.found == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: debug-apk-${{ github.run_number }}
           name: Debug APK ${{ github.run_number }}
           body: |
             Auto-built debug APK from workflow run #${{ github.run_number }}.
-          files: app/build/outputs/apk/**/*.apk
+          files: ${{ steps.apk_files.outputs.paths }}
