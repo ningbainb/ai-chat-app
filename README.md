@@ -83,6 +83,16 @@
 1. 先看同一次运行里 `Upload APK artifact(s)` 是否成功。
 2. 到 Artifacts 下载 `app-debug-apk`，确认 APK 确实已生成。
 3. 手动运行工作流时，确认 `publish_release=true`。
-4. 再看 `Collect APK file list for release` 步骤日志，确认找到的 APK 路径。
+4. 再看 `Publish APK to GitHub Release` 步骤日志，确认发布条件与上传路径。
 
-> 现在工作流会先收集 APK 文件列表，再上传到 Release，避免 Release 步骤“空白但不清楚原因”。
+> 现在工作流使用通配符路径上传 APK，并通过条件判断仅在手动触发且 `publish_release=true` 时发布 Release。
+
+
+### 如果工作流“0 秒直接失败”
+这通常是工作流表达式/触发器配置问题（例如触发上下文里引用了不存在的字段）。
+
+本仓库已修复为：
+- `push` / `pull_request` 使用显式空对象写法（`push: {}`、`pull_request: {}`）
+- Release 条件改为 `github.event.inputs.publish_release == "true"`，避免在非手动触发时读取不到 `inputs` 导致异常
+
+如果你还遇到 0 秒失败，请把那次 run 的最上方红色报错原文贴我（通常会写明 YAML 哪一行有问题）。
