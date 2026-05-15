@@ -30,3 +30,13 @@
 ## 注意
 - 本 Demo 不会自动发送消息，只提供复制。
 - 用户需自行确保调用的模型支持图片输入与 JSON 输出。
+
+
+## GitHub Actions 自动构建 APK
+- 工作流文件：`.github/workflows/android-apk.yml`
+- 触发方式：
+  - 推送到 `main` / `work`
+  - 提交到 `main` 的 Pull Request
+  - 手动触发（Actions 页面里的 `workflow_dispatch`）
+- 产物位置：Actions 运行详情中的 `app-debug-apk` artifact。
+- 若使用 `tag` 触发（如 `v1.0.0`），还会把 release APK 上传到 GitHub Release 附件。
