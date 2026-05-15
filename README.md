@@ -1,1 +1,63 @@
 # ai-chat-app
+
+本仓库现已初始化为一个 **Android 本地版 AI 聊天助手**（无后端、无 VIP）。
+
+## 功能（MVP）
+- 从相册选择聊天截图
+- 直接调用多模态 OpenAI 兼容接口分析截图
+- 根据风格和目标生成多条回复建议
+- 一键复制建议文案
+- 本地保存历史记录（Room）
+- 本地保存 API 配置（EncryptedSharedPreferences）
+
+## 技术栈
+- Kotlin + Jetpack Compose
+- MVVM + Repository
+- Retrofit + OkHttp + Kotlinx Serialization
+- Room
+- EncryptedSharedPreferences (AndroidX Security)
+
+## 使用步骤
+1. 使用 Android Studio 打开项目。
+2. 同步 Gradle。
+3. 运行 App。
+4. 前往「设置」页填写：
+   - Base URL（OpenAI 兼容地址，如 `https://api.openai.com`）
+   - API Key
+   - Vision Model（如 `gpt-4o-mini`）
+5. 回到首页选择截图，填写目标和风格，点击生成。
+
+## 注意
+- 本 Demo 不会自动发送消息，只提供复制。
+- 用户需自行确保调用的模型支持图片输入与 JSON 输出。
+
+## GitHub 云端打包 APK（推荐）
+
+仓库已提供 GitHub Actions 工作流：`.github/workflows/android-build.yml`。
+
+### 使用方式
+1. 把代码推送到 GitHub 仓库。
+2. 打开仓库 **Actions** 页面。
+3. 选择 **Android CI Build** 工作流并点击 **Run workflow**。
+4. 默认会在该次运行的 **Artifacts** 里生成 `app-debug-apk` 可下载。
+5. 如果希望在仓库首页也直接看到 APK，请在手动运行时把 `publish_release` 选成 `true`，工作流会自动创建 GitHub Release 并上传 APK。
+
+### 产物位置
+- Debug APK：`app/build/outputs/apk/debug/app-debug.apk`
+
+### 说明
+- 工作流固定使用 **JDK 17** 与 **Gradle 8.7**，避免本地 JDK 版本不一致导致的构建失败。
+- 这是 Debug 包，适合测试与演示。
+- `publish_release=true` 时，APK 会出现在仓库 **Releases** 页面，便于你“直接看见并下载”。
+
+
+
+### 如果 Actions 页面“看不到工作流/看不到运行记录”
+请按下面逐条检查：
+1. 你是否已经把本地代码 **push 到 GitHub 默认分支**（`main` 或 `master`）。
+2. 仓库是否启用了 Actions：`Settings -> Actions -> General -> Allow all actions`。
+3. 在 Actions 页左侧点击 **Android CI Build**，再点 **Run workflow** 手动触发。
+4. 如果你是 fork 仓库，首次运行可能需要在 Actions 页点击启用。
+5. 触发后进入单次运行详情页，在底部 **Artifacts** 下载 `app-debug-apk`。
+
+> 说明：当前工作流会在 `main/master` 的 push、PR，以及手动 `workflow_dispatch` 下触发。
