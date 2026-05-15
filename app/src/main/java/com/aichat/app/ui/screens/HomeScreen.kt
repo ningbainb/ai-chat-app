@@ -49,9 +49,13 @@ fun HomeScreen(viewModel: MainViewModel, nav: NavController) {
             Button(onClick = { nav.navigate("settings") }) { Text("设置") }
             Button(onClick = { nav.navigate("history") }) { Text("历史") }
         }
+        Text(if (uri == null) "未选择图片" else "已选择图片：$uri")
         OutlinedTextField(value = style, onValueChange = { style = it }, label = { Text("风格") }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(value = goal, onValueChange = { goal = it }, label = { Text("目标") }, modifier = Modifier.fillMaxWidth())
-        Button(onClick = { viewModel.generate(uri, goal, style) }, enabled = !loading && uri != null) { Text("生成回复") }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { style = "自然"; goal = "自然回复，不要油腻" }, enabled = !loading) { Text("重置推荐") }
+            Button(onClick = { viewModel.generate(uri, goal.trim(), style.trim()) }, enabled = !loading && uri != null) { Text("生成回复") }
+        }
 
         if (loading) CircularProgressIndicator()
         if (!error.isNullOrBlank()) Text("错误：$error")

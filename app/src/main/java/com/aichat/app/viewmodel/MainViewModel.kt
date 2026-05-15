@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
@@ -29,7 +30,18 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val loading = MutableStateFlow(false)
 
     fun generate(uri: Uri?, goal: String, style: String) {
-        if (uri == null) return
+        if (uri == null) {
+            error.value = "请先选择截图"
+            return
+        }
+        if (goal.isBlank()) {
+            error.value = "请填写目标"
+            return
+        }
+        if (style.isBlank()) {
+            error.value = "请填写风格"
+            return
+        }
         viewModelScope.launch {
             loading.value = true
             error.value = null
@@ -46,7 +58,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun saveSettings(baseUrl: String, apiKey: String, model: String) = repo.saveSettings(baseUrl, apiKey, model)
+    fun saveSettings(baseUrl: String, apiKey: String, model: String): String? {
+        if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+            return "Base URL 必须以 http:// 或 https:// 开头"
+        }
+        if (apiKey.isBlank()) return "API Key 不能为空"
+        if (model.isBlank()) return "Model 不能为空"
+        repo.saveSettings(baseUrl, apiKey, model)
+        return null
+    }
     fun readSettings(): Triple<String, String, String> = repo.readSettings()
 
     private fun toDataUrl(uri: Uri): String {
@@ -70,4 +90,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         resized.compress(Bitmap.CompressFormat.JPEG, 80, out)
         return out.toByteArray()
     }
-}
+
+    fun parseSuggestions(jsonText: String): List<ChatSuggestion> =
+        runCatching { json.decodeFromString<com.aichat.app.data.model.SuggestionPayload>(jsonText).suggestions }.getOrDefault(emptyList())
