@@ -54,10 +54,10 @@
 
 ### 如果 Actions 页面“看不到工作流/看不到运行记录”
 请按下面逐条检查：
-1. 你是否已经把本地代码 **push 到 GitHub 默认分支**（`main` 或 `master`）。
+1. 你是否已经把包含工作流文件的提交 push 到 GitHub（任意分支都可以）。
 2. 仓库是否启用了 Actions：`Settings -> Actions -> General -> Allow all actions`。
 3. 在 Actions 页左侧点击 **Android CI Build**，再点 **Run workflow** 手动触发。
 4. 如果你是 fork 仓库，首次运行可能需要在 Actions 页点击启用。
 5. 触发后进入单次运行详情页，在底部 **Artifacts** 下载 `app-debug-apk`。
 
-> 说明：当前工作流会在 `main/master` 的 push、PR，以及手动 `workflow_dispatch` 下触发。
+> 说明：当前工作流会在任意分支的 push、PR，以及手动 `workflow_dispatch` 下触发。

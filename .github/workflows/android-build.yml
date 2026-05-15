@@ -10,9 +10,7 @@ on:
         type: choice
         options: ["false", "true"]
   push:
-    branches: ["main", "master"]
   pull_request:
-    branches: ["main", "master"]
 
 jobs:
   build-debug:
