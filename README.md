@@ -30,3 +30,44 @@
 ## 注意
 - 本 Demo 不会自动发送消息，只提供复制。
 - 用户需自行确保调用的模型支持图片输入与 JSON 输出。
+
+## 使用 GitHub Actions 构建并上传 APK
+
+仓库内已包含工作流：`.github/workflows/build-apk.yml`。
+
+### 1) GitHub 构建环境说明
+- 运行环境：`ubuntu-latest`
+- Java：Temurin JDK 17（Android Gradle 常用版本）
+- Gradle：8.7（通过 `gradle/actions/setup-gradle` 安装与缓存）
+- 构建任务：
+  - `gradle :app:assembleDebug`
+  - `gradle :app:assembleRelease`
+
+### 2) 触发方式
+- **手动触发**：Actions 页面选择 `Build Android APK`，点击 `Run workflow`
+- **推送 main 分支**：自动构建
+- **提交 PR 到 main**：自动构建（用于校验）
+- **推送 tag（`v*`）**：构建后会自动创建 GitHub Release 并上传 APK
+
+示例 tag：`v1.0.0`
+
+### 3) APK 上传位置
+- 普通构建（手动 / push / PR）：
+  - 在该次工作流运行页的 **Artifacts** 下载：`apk-<run_number>`
+- tag 构建（如 `v1.0.0`）：
+  - 除 Artifacts 外，还会在仓库 **Releases** 页面创建对应发布并附带 APK 文件
+
+### 4) 推荐发布流程
+1. 本地确认代码后提交并推送到 `main`。
+2. 打版本 tag：
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+3. 等待 Actions 完成后，到 `Releases` 下载 APK。
+
+### 5) 可选：正式签名（当前未启用）
+当前工作流可直接产出 release APK，但默认通常是调试或未注入你个人 keystore 的签名配置。
+如需“可对外分发”的正式包，建议后续增加：
+- GitHub Secrets：`SIGNING_KEYSTORE_BASE64`、`SIGNING_STORE_PASSWORD`、`SIGNING_KEY_ALIAS`、`SIGNING_KEY_PASSWORD`
+- 工作流中解码 keystore 并在 Gradle 中读取环境变量进行 release signing。
