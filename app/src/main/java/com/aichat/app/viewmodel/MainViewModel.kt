@@ -93,3 +93,4 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun parseSuggestions(jsonText: String): List<ChatSuggestion> =
         runCatching { json.decodeFromString<com.aichat.app.data.model.SuggestionPayload>(jsonText).suggestions }.getOrDefault(emptyList())
+}
