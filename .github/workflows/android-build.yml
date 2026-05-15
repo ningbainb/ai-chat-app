@@ -40,13 +40,19 @@ jobs:
         run: |
           gradle --no-daemon :app:assembleDebug --stacktrace --info 2>&1 | tee build-debug.log
 
-      - name: Upload debug APK artifact
+      - name: Inspect APK output directory
+        if: always()
+        run: |
+          echo "Listing APK outputs:"
+          find app/build/outputs -maxdepth 6 -type f | sort || true
+
+      - name: Upload APK artifact(s)
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          path: app/build/outputs/apk/**/*.apk
+          if-no-files-found: warn
 
       - name: Upload build log artifact
         if: always()
@@ -74,4 +80,4 @@ jobs:
           name: Debug APK ${{ github.run_number }}
           body: |
             Auto-built debug APK from workflow run #${{ github.run_number }}.
-          files: app/build/outputs/apk/debug/app-debug.apk
+          files: app/build/outputs/apk/**/*.apk

@@ -39,7 +39,7 @@
 1. 把代码推送到 GitHub 仓库。
 2. 打开仓库 **Actions** 页面。
 3. 选择 **Android CI Build** 工作流并点击 **Run workflow**。
-4. 默认会在该次运行的 **Artifacts** 里生成 `app-debug-apk` 可下载。
+4. 默认会在该次运行的 **Artifacts** 里生成 `app-debug-apk` 可下载（现在会自动匹配 `app/build/outputs/apk/**/*.apk`，避免固定文件名导致上传失败）。
 5. 如果希望在仓库首页也直接看到 APK，请在手动运行时把 `publish_release` 选成 `true`，工作流会自动创建 GitHub Release 并上传 APK。
 
 ### 产物位置
