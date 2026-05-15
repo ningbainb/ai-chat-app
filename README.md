@@ -84,6 +84,7 @@
 2. 到 Artifacts 下载 `app-debug-apk`，确认 APK 确实已生成。
 3. 手动运行工作流时，确认 `publish_release=true`。
 4. 再看 `Publish APK to GitHub Release` 步骤日志，确认发布条件与上传路径。
+5. 如果你点了 **Re-run jobs**，现在也不会因为 tag 重名导致发布失败（tag 已改为 `run_id + run_attempt` 唯一值）。
 
 > 现在工作流使用通配符路径上传 APK，并通过条件判断仅在手动触发且 `publish_release=true` 时发布 Release。
 

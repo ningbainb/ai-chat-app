@@ -46,8 +46,22 @@ jobs:
           echo "Listing APK outputs:"
           find app/build/outputs -maxdepth 6 -type f | sort || true
 
-      - name: Upload APK artifact(s)
+      - name: Collect APK file list
         if: success()
+        id: apk_files
+        run: |
+          shopt -s globstar nullglob
+          files=(app/build/outputs/apk/**/*.apk)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "has_apk=false" >> "$GITHUB_OUTPUT"
+          else
+            printf '%s\n' "${files[@]}" > apk-files.txt
+            echo "has_apk=true" >> "$GITHUB_OUTPUT"
+            echo "apk_list_file=apk-files.txt" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload APK artifact(s)
+        if: success() && steps.apk_files.outputs.has_apk == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
@@ -73,11 +87,11 @@ jobs:
           if-no-files-found: warn
 
       - name: Publish APK to GitHub Release
-        if: success() && github.event_name == 'workflow_dispatch' && github.event.inputs.publish_release == 'true'
+        if: success() && github.event_name == 'workflow_dispatch' && github.event.inputs.publish_release == 'true' && steps.apk_files.outputs.has_apk == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: debug-apk-${{ github.run_number }}
-          name: Debug APK ${{ github.run_number }}
+          tag_name: debug-apk-${{ github.run_id }}-${{ github.run_attempt }}
+          name: Debug APK ${{ github.run_number }} (attempt ${{ github.run_attempt }})
           body: |
-            Auto-built debug APK from workflow run #${{ github.run_number }}.
+            Auto-built debug APK from workflow run #${{ github.run_number }} (attempt ${{ github.run_attempt }}).
           files: app/build/outputs/apk/**/*.apk
