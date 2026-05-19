@@ -6,7 +6,7 @@
         android:allowBackup="true"
         android:label="AI Chat App"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+        android:theme="@style/Theme.AiChatApp">
         <activity
             android:name=".MainActivity"
             android:exported="true">
