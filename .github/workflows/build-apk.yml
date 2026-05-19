@@ -2,6 +2,16 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: Build type to package
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - debug
+          - release
   push:
     branches:
       - main
@@ -10,6 +20,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -39,9 +53,11 @@ jobs:
           chmod +x ./gradlew
 
       - name: Build debug APK
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'all' || github.event.inputs.build_type == 'debug'
         run: ./gradlew --no-daemon assembleDebug
 
       - name: Build release APK
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'all' || github.event.inputs.build_type == 'release'
         run: ./gradlew --no-daemon assembleRelease
 
       - name: Upload APK artifacts
